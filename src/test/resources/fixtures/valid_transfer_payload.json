@@ -1,0 +1,15 @@
+{
+  "from": {
+    "accountHolder": "aaa",
+    "accountNumber": "11111111",
+    "sortCode": "010101",
+    "reference": "abc"
+  },
+  "to": {
+      "accountHolder": "bbb",
+      "accountNumber": "22222222",
+      "sortCode": "020202",
+      "reference": "xyz"
+    }
+  }
+}

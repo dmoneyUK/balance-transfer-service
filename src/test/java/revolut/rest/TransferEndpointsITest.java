@@ -12,17 +12,17 @@ import java.io.IOException;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BalanceTransferEndpointsITest extends JerseyTest {
+public class TransferEndpointsITest extends JerseyTest {
     
     @Override
     protected Application configure() {
-        return new ResourceConfig(BalanceTransferEndpoints.class);
+        return new ResourceConfig(TransferEndpoints.class);
     }
     
     @Test
-    public void whenSendingGet_thenMessageIsReturned() throws IOException {
+    public void shouldReturn201_whenPost() throws IOException {
         
-        final Response response = target("revolut/balanceTransfer")
+        final Response response = target("revolut/transfer")
                 .request()
                 .post(Entity.json(""));
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());

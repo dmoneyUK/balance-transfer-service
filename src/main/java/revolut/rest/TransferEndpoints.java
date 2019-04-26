@@ -7,10 +7,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/revolut")
-public class BalanceTransferEndpoints {
+public class TransferEndpoints {
     
     @POST
-    @Path("/balanceTransfer")
+    @Path("/transfer")
     @Produces(MediaType.APPLICATION_JSON)
     public Response transfer() {
         return Response.ok("{\"result\": \"success\"}").build();
