@@ -7,7 +7,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 @Slf4j
-public class App {
+public class Application {
     
     public static void main(String[] args) throws Exception {
         
