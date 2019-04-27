@@ -1,8 +1,15 @@
 package revolut.rest;
 
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
 import org.junit.Test;
+import revolut.config.AppBinder;
+import revolut.config.JerseyConfig;
+import revolut.service.MoneyTransferService;
+import revolut.service.MoneyTransferServiceImpl;
+import utils.JsonFixtures;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
@@ -12,11 +19,13 @@ import java.io.IOException;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TransferEndpointsITest extends JerseyTest {
+public class MoneyTransferEndpointsITest extends JerseyTest {
     
     @Override
     protected Application configure() {
-        return new ResourceConfig(TransferEndpoints.class);
+        enable(TestProperties.LOG_TRAFFIC);
+        enable(TestProperties.DUMP_ENTITY);
+        return new JerseyConfig();
     }
     
     @Test
@@ -24,7 +33,7 @@ public class TransferEndpointsITest extends JerseyTest {
         
         final Response response = target("revolut/transfer")
                 .request()
-                .post(Entity.json(""));
+                .post(Entity.json(JsonFixtures.read("fixtures/valid_transfer_payload.json")));
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
         
     }

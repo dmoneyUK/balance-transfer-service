@@ -2,14 +2,13 @@
   "from": {
     "accountHolder": "aaa",
     "accountNumber": "11111111",
-    "sortCode": "010101",
-    "reference": "abc"
-  },
+    "sortCode": "010101"
+    },
   "to": {
-      "accountHolder": "bbb",
-      "accountNumber": "22222222",
-      "sortCode": "020202",
-      "reference": "xyz"
-    }
-  }
+    "accountHolder": "bbb",
+    "accountNumber": "22222222",
+    "sortCode": "020202"
+    },
+  "amount": 100,
+  "reference": "aaa to bbb"
 }
