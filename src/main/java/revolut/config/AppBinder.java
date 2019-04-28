@@ -3,8 +3,8 @@ package revolut.config;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import revolut.rest.MoneyTransferEndpoints;
 import revolut.rest.MoneyTransferEndpointsImpl;
-import revolut.service.MoneyTransferService;
-import revolut.service.MoneyTransferServiceImpl;
+import revolut.domain.service.MoneyTransferService;
+import revolut.domain.service.MoneyTransferServiceImpl;
 
 public class AppBinder extends AbstractBinder {
     
