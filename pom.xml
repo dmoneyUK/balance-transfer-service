@@ -46,6 +46,13 @@
         </dependency>
 
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.197</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.20</version>
@@ -77,6 +84,8 @@
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.26</version>
         </dependency>
+
+
         <!-- Test -->
         <dependency>
             <groupId>junit</groupId>

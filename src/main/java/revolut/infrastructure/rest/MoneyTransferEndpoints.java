@@ -1,6 +1,6 @@
-package revolut.rest;
+package revolut.infrastructure.rest;
 
-import revolut.rest.entity.MoneyTransferRequest;
+import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/revolut")
+@Path("/transactions")
 public interface MoneyTransferEndpoints {
     
     @POST

@@ -8,7 +8,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import revolut.config.JerseyConfig;
 
-@Slf4j
+//@Slf4j
 public class Application {
     
     public static void main(String[] args) throws Exception {
@@ -26,7 +26,7 @@ public class Application {
             jettyServer.start();
             jettyServer.join();
         } catch (Exception ex) {
-            log.error("Error occurred while starting Jetty", ex);
+            //log.error("Error occurred while starting Jetty", ex);
         }finally {
             jettyServer.destroy();
         }

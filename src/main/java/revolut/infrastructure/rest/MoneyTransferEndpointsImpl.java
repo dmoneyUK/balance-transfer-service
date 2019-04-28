@@ -1,9 +1,9 @@
-package revolut.rest;
+package revolut.infrastructure.rest;
 
 import lombok.extern.slf4j.Slf4j;
+import revolut.domain.dto.ProcessResult;
 import revolut.domain.service.MoneyTransferService;
-import revolut.domain.service.dto.ProcessResult;
-import revolut.rest.entity.MoneyTransferRequest;
+import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
@@ -32,6 +32,7 @@ public class MoneyTransferEndpointsImpl implements MoneyTransferEndpoints {
         Status responseStatus = INTERNAL_SERVER_ERROR;
         ProcessResult result = moneyTransferService.process(moneyTransferRequest);
     
+        log.info("Money transfer result: {}", result);
         switch (result.getResultType()) {
             case SUCCESS:
                 responseStatus = OK;

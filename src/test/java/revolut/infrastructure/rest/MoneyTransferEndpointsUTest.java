@@ -1,13 +1,13 @@
-package revolut.rest;
+package revolut.infrastructure.rest;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import revolut.domain.dto.ProcessResult;
+import revolut.domain.dto.ResultType;
 import revolut.domain.service.MoneyTransferService;
-import revolut.domain.service.dto.ProcessResult;
-import revolut.domain.service.dto.ResultType;
-import revolut.rest.entity.MoneyTransferRequest;
+import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
 import javax.ws.rs.core.Response;
 

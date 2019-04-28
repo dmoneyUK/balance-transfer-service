@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 @ApplicationPath("/")
 public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
-        packages("revolut.rest");
+        packages("revolut.infrastructure.rest");
         register(new AppBinder());
         register(new LoggingFeature(Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME),
                                     Level.INFO, LoggingFeature.Verbosity.PAYLOAD_ANY, 10000));

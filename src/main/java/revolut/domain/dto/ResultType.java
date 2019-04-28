@@ -1,4 +1,4 @@
-package revolut.domain.service.dto;
+package revolut.domain.dto;
 
 public enum ResultType {
     

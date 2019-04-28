@@ -1,4 +1,4 @@
-package revolut.rest.entity;
+package revolut.infrastructure.rest.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class MoneyTransferRequest {
     
-    private  AccountInfo from;
-    private AccountInfo to;
+    private Integer from;
+    private Integer to;
     private BigDecimal amount;
-    private String reference;
 }
