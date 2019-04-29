@@ -4,10 +4,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import revolut.domain.dto.ProcessResult;
+import revolut.domain.dto.ResultType;
+import revolut.domain.exception.TransactionException;
+import revolut.domain.model.AccountDetails;
 import revolut.infrastructure.repositories.AccountRepository;
+import revolut.infrastructure.rest.entity.MoneyTransferRequest;
+import utils.TestAccount;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 
 public class MoneyTransferServiceImpUTest {
     
@@ -22,20 +31,20 @@ public class MoneyTransferServiceImpUTest {
     }
     
     @Test
-    public void shouldMoveMoneyBetweenAccounts() {
-        //AccountInfo fromAccount = A.getAccountInfo();
-        //AccountInfo toAccount = B.getAccountInfo();
-        //MoneyTransferRequest request = MoneyTransferRequest.builder()
-        //                                                   .from(fromAccount)
-        //                                                   .to(toAccount)
-        //                                                   .amount(BigDecimal.TEN)
-        //                                                   .reference("a to b")
-        //                                                   .build();
-        //
-        //ProcessResult actual = testObj.process(request);
-        //verify(accountRepositoryMock).findBy( fromAccount.getAccountNumber());
-        //verify(accountRepositoryMock).findBy(toAccount.getAccountNumber());
-        //
-        //assertThat(actual.getResultType()).isEqualTo(ResultType.SUCCESS);
+    public void shouldThrowTransactionException_whenGetExceptionFromRepository() {
+        
+        when(accountRepositoryMock.findBy(anyInt())).thenThrow(RuntimeException.class);
+        AccountDetails fromAccount = TestAccount.A.getAccountDetails();
+        AccountDetails toAccount = TestAccount.B.getAccountDetails();
+        MoneyTransferRequest request = MoneyTransferRequest.builder()
+                                                           .from(fromAccount.getAccountNumber())
+                                                           .to(toAccount.getAccountNumber())
+                                                           .amount(BigDecimal.TEN)
+                                                           .build();
+        
+        ProcessResult actual = testObj.process(request);
+        
+        assertThat(actual.getResultType()).isEqualTo(ResultType.DEFAULT_FAILURE);
+        
     }
 }

@@ -2,6 +2,7 @@ package revolut.domain.service;
 
 import lombok.extern.slf4j.Slf4j;
 import revolut.domain.dto.ProcessResult;
+import revolut.domain.exception.TransactionException;
 import revolut.domain.model.AccountDetails;
 import revolut.infrastructure.repositories.AccountRepository;
 import revolut.infrastructure.rest.entity.MoneyTransferRequest;
@@ -9,7 +10,9 @@ import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 import javax.inject.Inject;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 
+import static revolut.domain.dto.ResultType.DEFAULT_FAILURE;
 import static revolut.domain.dto.ResultType.SUCCESS;
 @Slf4j
 public class MoneyTransferServiceImpl implements MoneyTransferService {
@@ -21,18 +24,25 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
         this.accountRepository = accountRepository;
     }
     
-    //TODO implement transactional process
     @Override
-    public ProcessResult process(MoneyTransferRequest moneyTransferRequest) {
+    public ProcessResult process(MoneyTransferRequest moneyTransferRequest){
         Integer fromAccountNumber = moneyTransferRequest.getFrom();
         Integer toAccountNumber = moneyTransferRequest.getTo();
-        
-        AccountDetails fromAccountDetails = accountRepository.findBy(fromAccountNumber);
-        AccountDetails toAccountDetails = accountRepository.findBy(toAccountNumber);
-        
-        BigDecimal fromAccountUpdatedBalance = fromAccountDetails.getBalance().min(moneyTransferRequest.getAmount());
-        BigDecimal toAccountUpdatedBalance = toAccountDetails.getBalance().add(moneyTransferRequest.getAmount());
-        
+    
+        AccountDetails fromAccountDetails = null;
+        AccountDetails toAccountDetails = null;
+        try {
+            fromAccountDetails = accountRepository.findBy(fromAccountNumber);
+            toAccountDetails = accountRepository.findBy(toAccountNumber);
+    
+            BigDecimal fromAccountUpdatedBalance = fromAccountDetails.getBalance().min(moneyTransferRequest.getAmount());
+            BigDecimal toAccountUpdatedBalance = toAccountDetails.getBalance().add(moneyTransferRequest.getAmount());
+        } catch (Exception e) {
+            log.error("Error happened during transfer money from {} to {}. Reason: [{}]", fromAccountNumber, toAccountNumber, e);
+            return ProcessResult.builder()
+                                .resultType(DEFAULT_FAILURE)
+                                .build();
+        }
         
         return ProcessResult.builder().resultType(SUCCESS).build();
     }

@@ -11,6 +11,8 @@ import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
 import javax.ws.rs.core.Response;
 
+import java.sql.SQLException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,7 +34,7 @@ public class MoneyTransferEndpointsUTest {
     }
     
     @Test
-    public void shouldReturn200_whenServiceProcessSuccessfully() {
+    public void shouldReturn200_whenServiceProcessSuccessfully() throws SQLException {
     
         //Given
         MoneyTransferRequest requestMock = mock(MoneyTransferRequest.class);
@@ -51,7 +53,7 @@ public class MoneyTransferEndpointsUTest {
     }
     
     @Test
-    public void shouldReturn500AndReason_whenServiceProcessGetDefaultFailure() {
+    public void shouldReturn500AndReason_whenServiceProcessGetDefaultFailure() throws SQLException {
         
         //Given
         MoneyTransferRequest requestMock = mock(MoneyTransferRequest.class);
@@ -71,7 +73,7 @@ public class MoneyTransferEndpointsUTest {
     }
     
     @Test
-    public void shouldReturn501_whenServiceProcessGotUnsupportedFailured() {
+    public void shouldReturn501_whenServiceProcessGotUnsupportedFailured() throws SQLException {
         
         //Given
         MoneyTransferRequest requestMock = mock(MoneyTransferRequest.class);

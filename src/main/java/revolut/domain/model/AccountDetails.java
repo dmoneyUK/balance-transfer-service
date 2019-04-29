@@ -17,8 +17,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class AccountDetails {
     
+    private final Integer accountNumber;
     private final String accountHolder;
-    private final String sortCode;
-    private final String accountNumber;
     private final BigDecimal balance;
 }
