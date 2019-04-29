@@ -1,9 +1,9 @@
-package revolut.infrastructure.repositories;
+package revolut.infrastructure.persistence;
 
 import revolut.domain.model.AccountDetails;
 
 import java.sql.SQLException;
 
-public interface AccountRepository {
+public interface AccountDao {
     AccountDetails findBy(Integer accountNumber);
 }

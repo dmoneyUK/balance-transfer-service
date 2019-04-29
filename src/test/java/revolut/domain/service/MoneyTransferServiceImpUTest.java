@@ -6,9 +6,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import revolut.domain.dto.ProcessResult;
 import revolut.domain.dto.ResultType;
-import revolut.domain.exception.TransactionException;
 import revolut.domain.model.AccountDetails;
-import revolut.infrastructure.repositories.AccountRepository;
+import revolut.infrastructure.persistence.AccountDao;
 import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 import utils.TestAccount;
 
@@ -22,18 +21,18 @@ public class MoneyTransferServiceImpUTest {
     
     private MoneyTransferService testObj;
     @Mock
-    private AccountRepository accountRepositoryMock;
+    private AccountDao accountDaoMock;
     
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        testObj = new MoneyTransferServiceImpl(accountRepositoryMock);
+        testObj = new MoneyTransferServiceImpl(accountDaoMock);
     }
     
     @Test
     public void shouldThrowTransactionException_whenGetExceptionFromRepository() {
         
-        when(accountRepositoryMock.findBy(anyInt())).thenThrow(RuntimeException.class);
+        when(accountDaoMock.findBy(anyInt())).thenThrow(RuntimeException.class);
         AccountDetails fromAccount = TestAccount.A.getAccountDetails();
         AccountDetails toAccount = TestAccount.B.getAccountDetails();
         MoneyTransferRequest request = MoneyTransferRequest.builder()

@@ -2,26 +2,24 @@ package revolut.domain.service;
 
 import lombok.extern.slf4j.Slf4j;
 import revolut.domain.dto.ProcessResult;
-import revolut.domain.exception.TransactionException;
 import revolut.domain.model.AccountDetails;
-import revolut.infrastructure.repositories.AccountRepository;
+import revolut.infrastructure.persistence.AccountDao;
 import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
 import javax.inject.Inject;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 
 import static revolut.domain.dto.ResultType.DEFAULT_FAILURE;
 import static revolut.domain.dto.ResultType.SUCCESS;
 @Slf4j
 public class MoneyTransferServiceImpl implements MoneyTransferService {
     
-    private AccountRepository accountRepository;
+    private AccountDao accountDao;
     
     @Inject
-    public MoneyTransferServiceImpl(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    public MoneyTransferServiceImpl(AccountDao accountDao) {
+        this.accountDao = accountDao;
     }
     
     @Override
@@ -32,8 +30,8 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
         AccountDetails fromAccountDetails = null;
         AccountDetails toAccountDetails = null;
         try {
-            fromAccountDetails = accountRepository.findBy(fromAccountNumber);
-            toAccountDetails = accountRepository.findBy(toAccountNumber);
+            fromAccountDetails = accountDao.findBy(fromAccountNumber);
+            toAccountDetails = accountDao.findBy(toAccountNumber);
     
             BigDecimal fromAccountUpdatedBalance = fromAccountDetails.getBalance().min(moneyTransferRequest.getAmount());
             BigDecimal toAccountUpdatedBalance = toAccountDetails.getBalance().add(moneyTransferRequest.getAmount());

@@ -7,14 +7,11 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import revolut.config.JerseyConfig;
-import revolut.infrastructure.persistence.H2Utils;
 
 //@Slf4j
 public class Application {
     
     public static void main(String[] args) throws Exception {
-    
-        H2Utils.init();
         
         ResourceConfig config = new JerseyConfig();
     
