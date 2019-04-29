@@ -1,7 +1,7 @@
 package revolut.infrastructure.rest;
 
 import lombok.extern.slf4j.Slf4j;
-import revolut.domain.dto.ProcessResult;
+import revolut.domain.dto.TransactionResult;
 import revolut.domain.service.MoneyTransferService;
 import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
@@ -30,7 +30,7 @@ public class MoneyTransferEndpointsImpl implements MoneyTransferEndpoints {
         //Improve if time allowed.
     
         Status responseStatus = INTERNAL_SERVER_ERROR;
-        ProcessResult result = moneyTransferService.process(moneyTransferRequest);
+        TransactionResult result = moneyTransferService.process(moneyTransferRequest);
     
         log.info("Money transfer result: {}", result);
         switch (result.getResultType()) {

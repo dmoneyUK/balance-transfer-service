@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import revolut.domain.dto.ProcessResult;
+import revolut.domain.dto.TransactionResult;
 import revolut.domain.dto.ResultType;
 import revolut.domain.service.MoneyTransferService;
 import revolut.infrastructure.rest.entity.MoneyTransferRequest;
@@ -36,10 +36,10 @@ public class MoneyTransferEndpointsUTest {
     
         //Given
         MoneyTransferRequest requestMock = mock(MoneyTransferRequest.class);
-        ProcessResult processResult = ProcessResult.builder()
-                                                   .resultType(ResultType.SUCCESS)
-                                                   .build();
-        when(moneyTransferServiceMock.process(requestMock)).thenReturn(processResult);
+        TransactionResult transactionResult = TransactionResult.builder()
+                                                               .resultType(ResultType.SUCCESS)
+                                                               .build();
+        when(moneyTransferServiceMock.process(requestMock)).thenReturn(transactionResult);
     
         //When
         Response actual = testObject.transfer(requestMock);
@@ -47,7 +47,7 @@ public class MoneyTransferEndpointsUTest {
         //Then
         verify(moneyTransferServiceMock).process(requestMock);
         assertThat(actual.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        assertThat(actual.getEntity()).isEqualTo(processResult.getReason());
+        assertThat(actual.getEntity()).isEqualTo(transactionResult.getReason());
     }
     
     @Test
@@ -55,11 +55,11 @@ public class MoneyTransferEndpointsUTest {
         
         //Given
         MoneyTransferRequest requestMock = mock(MoneyTransferRequest.class);
-        ProcessResult processResult = ProcessResult.builder()
-                                                   .resultType(ResultType.DEFAULT_FAILURE)
-                                                   .reason(TEST_FAILURE_REASON)
-                                                   .build();
-        when(moneyTransferServiceMock.process(requestMock)).thenReturn(processResult);
+        TransactionResult transactionResult = TransactionResult.builder()
+                                                               .resultType(ResultType.DEFAULT_FAILURE)
+                                                               .reason(TEST_FAILURE_REASON)
+                                                               .build();
+        when(moneyTransferServiceMock.process(requestMock)).thenReturn(transactionResult);
         
         //When
         Response actual = testObject.transfer(requestMock);
@@ -76,10 +76,10 @@ public class MoneyTransferEndpointsUTest {
         //Given
         MoneyTransferRequest requestMock = mock(MoneyTransferRequest.class);
         when(moneyTransferServiceMock.process(requestMock))
-                .thenReturn(ProcessResult.builder()
-                                         .resultType(ResultType.UNSUPPORTED)
-                                         .reason(TEST_FAILURE_REASON)
-                                         .build());
+                .thenReturn(TransactionResult.builder()
+                                             .resultType(ResultType.UNSUPPORTED)
+                                             .reason(TEST_FAILURE_REASON)
+                                             .build());
         
         //When
         Response actual = testObject.transfer(requestMock);

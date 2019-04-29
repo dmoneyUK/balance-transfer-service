@@ -1,8 +1,8 @@
 package revolut.domain.service;
 
-import revolut.domain.dto.ProcessResult;
+import revolut.domain.dto.TransactionResult;
 import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
 public interface MoneyTransferService {
-    ProcessResult process(MoneyTransferRequest moneyTransferRequest);
+    TransactionResult process(MoneyTransferRequest moneyTransferRequest);
 }

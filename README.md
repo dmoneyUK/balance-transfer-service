@@ -42,3 +42,5 @@ For the time reaason, I made assumptions as below to keep things simple. They ca
 <li> body: </li>
 
 
+### Questions:
+* Without spring transactional management
