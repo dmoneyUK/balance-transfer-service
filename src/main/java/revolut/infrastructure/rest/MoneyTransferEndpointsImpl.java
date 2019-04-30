@@ -2,7 +2,7 @@ package revolut.infrastructure.rest;
 
 import lombok.extern.slf4j.Slf4j;
 import revolut.domain.dto.TransactionResult;
-import revolut.domain.service.MoneyTransferService;
+import revolut.domain.service.TransferTransactionService;
 import revolut.infrastructure.rest.entity.MoneyTransferRequest;
 
 import javax.inject.Inject;
@@ -16,11 +16,11 @@ import static javax.ws.rs.core.Response.Status.OK;
 @Slf4j
 public class MoneyTransferEndpointsImpl implements MoneyTransferEndpoints {
     
-    private final MoneyTransferService moneyTransferService;
+    private final TransferTransactionService transferTransactionService;
     
     @Inject
-    public MoneyTransferEndpointsImpl(MoneyTransferService moneyTransferService) {
-        this.moneyTransferService = moneyTransferService;
+    public MoneyTransferEndpointsImpl(TransferTransactionService transferTransactionService) {
+        this.transferTransactionService = transferTransactionService;
     }
     
     @Override
@@ -30,10 +30,10 @@ public class MoneyTransferEndpointsImpl implements MoneyTransferEndpoints {
         //Improve if time allowed.
     
         Status responseStatus = INTERNAL_SERVER_ERROR;
-        TransactionResult result = moneyTransferService.process(moneyTransferRequest);
+        TransactionResult result = transferTransactionService.process(moneyTransferRequest);
     
         log.info("Money transfer result: {}", result);
-        switch (result.getResultType()) {
+        switch (result) {
             case SUCCESS:
                 responseStatus = OK;
                 break;
@@ -42,6 +42,6 @@ public class MoneyTransferEndpointsImpl implements MoneyTransferEndpoints {
                 break;
         }
     
-        return Response.status(responseStatus).entity(result.getReason()).build();
+        return Response.status(responseStatus).entity(result).build();
     }
 }

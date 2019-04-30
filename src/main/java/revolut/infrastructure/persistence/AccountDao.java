@@ -1,9 +1,12 @@
 package revolut.infrastructure.persistence;
 
-import revolut.domain.model.AccountDetails;
+import revolut.domain.exception.TransationException;
+import revolut.domain.model.Account;
 
-import java.sql.SQLException;
+import java.math.BigDecimal;
 
 public interface AccountDao {
-    AccountDetails findBy(Integer AccountNumber) throws SQLException, RuntimeException;
+    Account findBy(Integer AccountNumber) throws TransationException;
+    
+    void transferBalance(Integer fromAccount, Integer toAccount, BigDecimal amount) throws TransationException;;
 }

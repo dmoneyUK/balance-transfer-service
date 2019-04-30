@@ -11,11 +11,23 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Slf4j
-public class H2ConnectionsUtils {
+public class H2ConnectionsManager {
     
-    public H2ConnectionsUtils(){
+    private static H2ConnectionsManager instance;
+    
+    private H2ConnectionsManager() {
         DbUtils.loadDriver("org.h2.Driver");
-        populateTestData();
+    }
+    
+    public static H2ConnectionsManager getInstance() {
+        if (instance == null) {
+            synchronized (H2ConnectionsManager.class) {
+                if (instance == null) {
+                    instance = new H2ConnectionsManager();
+                }
+            }
+        }
+        return instance;
     }
     
     public Connection getConnection() throws SQLException {

@@ -1,14 +1,14 @@
 DROP TABLE IF EXISTS Account;
 
-CREATE TABLE Account (AccountId LONG PRIMARY KEY AUTO_INCREMENT NOT NULL,
+CREATE TABLE Account (id LONG PRIMARY KEY AUTO_INCREMENT NOT NULL,
+AccountNumber INTEGER,
 AccountHolder VARCHAR(30),
-Balance DECIMAL(15,2),
-AccountNumber INTEGER
+Balance DECIMAL(15,2)
 );
 
-INSERT INTO Account (AccountHolder,Balance,AccountNumber) VALUES ('a',100.00,11111111);
-INSERT INTO Account (AccountHolder,Balance,AccountNumber) VALUES ('b',200.00,22222222);
-INSERT INTO Account (AccountHolder,Balance,AccountNumber) VALUES ('c',500.00,33333333);
-INSERT INTO Account (AccountHolder,Balance,AccountNumber) VALUES ('d',500.00,44444444);
-INSERT INTO Account (AccountHolder,Balance,AccountNumber) VALUES ('e',500.00,55555555);
-INSERT INTO Account (AccountHolder,Balance,AccountNumber) VALUES ('f',500.00,66666666);
+INSERT INTO Account (AccountNumber,AccountHolder,Balance) VALUES (11111111,'a',9999999999999.00);
+INSERT INTO Account (AccountNumber,AccountHolder,Balance) VALUES (22222222,'b',200.00);
+INSERT INTO Account (AccountNumber,AccountHolder,Balance) VALUES (33333333,'c',500.00);
+INSERT INTO Account (AccountNumber,AccountHolder,Balance) VALUES (44444444,'d',500.00);
+INSERT INTO Account (AccountNumber,AccountHolder,Balance) VALUES (55555555,'e',500.00);
+INSERT INTO Account (AccountNumber,AccountHolder,Balance) VALUES (66666666,'f',500.00);

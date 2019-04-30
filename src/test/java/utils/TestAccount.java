@@ -1,11 +1,11 @@
 package utils;
 
-import revolut.domain.model.AccountDetails;
+import revolut.domain.model.Account;
 
 import java.math.BigDecimal;
 
 public enum TestAccount {
-    A("a", 11111111, BigDecimal.valueOf(1000)), B("b", 22222222, BigDecimal.valueOf(2000));
+    A("a", 11111111, BigDecimal.valueOf(9999999999999L)), B("b", 22222222, BigDecimal.valueOf(2000));
     
     private final String accountHolder;
     
@@ -18,12 +18,12 @@ public enum TestAccount {
         this.balance = balance;
     }
     
-    public AccountDetails getAccountDetails() {
-        return AccountDetails.builder()
-                             .accountHolder(accountHolder)
-                             .accountNumber(accountNumber)
-                             .balance(balance)
-                             .build();
+    public Account getAccountDetails() {
+        return Account.builder()
+                      .accountHolder(accountHolder)
+                      .accountNumber(accountNumber)
+                      .balance(balance)
+                      .build();
     }
     
     public BigDecimal getBalance() {
