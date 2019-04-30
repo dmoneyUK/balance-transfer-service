@@ -25,7 +25,7 @@ public class MoneyTransferEndpointsFTest extends JerseyTest {
     }
     
     @Test
-    public void shouldReturn201_whenPost() throws IOException {
+    public void shouldReturn201_whenReceivedValidRequest() throws IOException {
         
         final Response response = target("transactions/transfer")
                 .request()
@@ -33,6 +33,7 @@ public class MoneyTransferEndpointsFTest extends JerseyTest {
         assertThat(response.getStatus()).isEqualTo(OK.getStatusCode());
         
     }
+    
 }
 
     

@@ -1,15 +1,18 @@
 package revolut.infrastructure.persistence;
 
-import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
+import com.atomikos.icatch.jta.UserTransactionImp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbutils.DbUtils;
 import org.h2.tools.RunScript;
 import revolut.domain.exception.TransactionException;
 import revolut.domain.model.AccountDetails;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
+import javax.transaction.UserTransaction;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,10 +27,11 @@ public class AccountDaoImpl implements AccountDao {
     private final static String SQL_CREATE_ACC = "INSERT INTO Account (AccountNumber, AccountHolder, Balance) VALUES (?, ?, ?)";
     private final static String SQL_UPDATE_ACC_BALANCE = "UPDATE Account SET Balance = ? WHERE AccountNumber = ? ";
     
-    private AtomikosNonXADataSourceBean ds;
+    private DataSource ds;
     
-    public AccountDaoImpl() {
-        getDataSource();
+    @Inject
+    public AccountDaoImpl(DataSource ds) {
+        this.ds = ds;
         populateTestData();
     }
     
@@ -62,6 +66,79 @@ public class AccountDaoImpl implements AccountDao {
         
     }
     
+    @Override
+    public int updateAccount(Integer accountNumber, BigDecimal newBalance) throws Exception {
+        
+        UserTransaction utx = new UserTransactionImp();
+        boolean error = false;
+        try {
+            utx.begin();
+            
+            Connection conn = null;
+            PreparedStatement lockStmt = null;
+            PreparedStatement updateStmt = null;
+            ResultSet rs = null;
+            int updateCount = -1;
+            try {
+                conn = ds.getConnection();
+                conn.setAutoCommit(false);
+                // lock account for writing:
+                lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
+                lockStmt.setLong(1, accountNumber);
+                rs = lockStmt.executeQuery();
+                AccountDetails targetAccount = null;
+                if (rs.next()) {
+                    targetAccount = new AccountDetails(rs.getInt("accountNumber"), rs.getString("accountHolder"),
+                                                       rs.getBigDecimal("Balance"));
+                    if (log.isDebugEnabled()) {
+                        log.debug("updateAccountBalance from Account: " + targetAccount);
+                    }
+                }
+                
+                if (targetAccount == null) {
+                    throw new TransactionException("updateAccountBalance(): fail to lock account : " + accountNumber);
+                }
+                // update account upon success locking
+                updateStmt = conn.prepareStatement(SQL_UPDATE_ACC_BALANCE);
+                updateStmt.setBigDecimal(1, newBalance);
+                updateStmt.setInt(2, accountNumber);
+                updateCount = updateStmt.executeUpdate();
+                if (log.isDebugEnabled()) {
+                    log.debug("New Balance after Update: " + targetAccount);
+                }
+                return updateCount;
+            } catch (SQLException se) {
+                // rollback transaction if exception occurs
+                log.error("updateAccountBalance(): User Transaction Failed, rollback initiated for: " + accountNumber, se);
+                try {
+                    if (conn != null) {
+                        conn.rollback();
+                    }
+                } catch (SQLException re) {
+                    error = true;
+                    throw new TransactionException("Fail to rollback transaction", re);
+                }
+            } finally {
+                DbUtils.closeQuietly(conn);
+                DbUtils.closeQuietly(rs);
+                DbUtils.closeQuietly(lockStmt);
+                DbUtils.closeQuietly(updateStmt);
+            }
+            return updateCount;
+        } catch (Exception e) {
+            error = true;
+            throw e;
+        } finally {
+            
+            if (error) {
+                utx.rollback();
+            } else {
+                utx.commit();
+            }
+        }
+    }
+    
+    
     private void populateTestData() {
         log.info("Populating Test User Table and data ..... ");
         Connection conn = null;
@@ -77,21 +154,5 @@ public class AccountDaoImpl implements AccountDao {
         } finally {
             DbUtils.closeQuietly(conn);
         }
-    }
-    
-    private DataSource getDataSource() {
-        if (ds == null) {
-            
-            ds = new AtomikosNonXADataSourceBean();
-            ds.setUniqueResourceName("RevolutDB");
-            ds.setUrl("jdbc:h2:mem:revolut;DB_CLOSE_DELAY=-1");
-            ds.setUser("sa");
-            ds.setPassword("sa");
-            ds.setDriverClassName("org.h2.Driver");
-            ds.setPoolSize(1);
-            ds.setBorrowConnectionTimeout(60);
-        }
-        
-        return ds;
     }
 }

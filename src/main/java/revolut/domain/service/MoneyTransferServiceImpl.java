@@ -26,6 +26,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
     public ProcessResult process(MoneyTransferRequest moneyTransferRequest){
         Integer fromAccountNumber = moneyTransferRequest.getFrom();
         Integer toAccountNumber = moneyTransferRequest.getTo();
+        BigDecimal update = moneyTransferRequest.getAmount();
     
         AccountDetails fromAccountDetails = null;
         AccountDetails toAccountDetails = null;
@@ -33,8 +34,12 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
             fromAccountDetails = accountDao.findBy(fromAccountNumber);
             toAccountDetails = accountDao.findBy(toAccountNumber);
     
-            BigDecimal fromAccountUpdatedBalance = fromAccountDetails.getBalance().min(moneyTransferRequest.getAmount());
-            BigDecimal toAccountUpdatedBalance = toAccountDetails.getBalance().add(moneyTransferRequest.getAmount());
+            BigDecimal fromAccountUpdatedBalance = fromAccountDetails.getBalance().subtract(update);
+            BigDecimal toAccountUpdatedBalance = toAccountDetails.getBalance().add(update);
+            
+            accountDao.updateAccount(fromAccountNumber, fromAccountUpdatedBalance);
+            accountDao.updateAccount(toAccountNumber, toAccountUpdatedBalance);
+            
         } catch (Exception e) {
             log.error("Error happened during transfer money from {} to {}. Reason: [{}]", fromAccountNumber, toAccountNumber, e);
             return ProcessResult.builder()

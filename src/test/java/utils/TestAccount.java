@@ -5,7 +5,7 @@ import revolut.domain.model.AccountDetails;
 import java.math.BigDecimal;
 
 public enum TestAccount {
-    A( 11111111,"a", BigDecimal.valueOf(1000)), B( 22222222,"b", BigDecimal.valueOf(2000));
+    A( 11111111,"a", BigDecimal.valueOf(100)), B( 22222222,"b", BigDecimal.valueOf(9999999999999L));
     
     private final Integer accountNumber;
     private final String accountHolder;
@@ -27,5 +27,13 @@ public enum TestAccount {
     
     public BigDecimal getBalance() {
         return balance;
+    }
+    
+    public Integer getAccountNumber() {
+        return accountNumber;
+    }
+    
+    public String getAccountHolder() {
+        return accountHolder;
     }
 }
