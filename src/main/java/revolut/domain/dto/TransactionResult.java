@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProcessResult {
-    private ResultType resultType;
+public class TransactionResult {
+    private TransactionResultType resultType;
     private String reason;
 }

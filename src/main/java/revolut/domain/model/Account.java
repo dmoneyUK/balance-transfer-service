@@ -15,10 +15,9 @@ import java.math.BigDecimal;
 @ToString
 @Builder
 @AllArgsConstructor
-public class AccountDetails {
+public class Account {
     
+    private final Integer accountNumber;
     private final String accountHolder;
-    private final String sortCode;
-    private final String accountNumber;
     private final BigDecimal balance;
 }

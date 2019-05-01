@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MoneyTransferRequest {
+public class TransferTransactionRequest {
     
-    private Integer from;
-    private Integer to;
+    private Integer source;
+    private Integer target;
     private BigDecimal amount;
 }
