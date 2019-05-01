@@ -6,8 +6,6 @@ import revolut.domain.service.TransferTransactionServiceImpl;
 import revolut.infrastructure.persistence.AccountDao;
 import revolut.infrastructure.persistence.AccountDaoImpl;
 import revolut.infrastructure.persistence.H2ConnectionsManager;
-import revolut.infrastructure.rest.TransferTransactionEndpoints;
-import revolut.infrastructure.rest.TransferTransactionEndpointsImpl;
 
 import javax.inject.Singleton;
 
@@ -16,9 +14,6 @@ public class AppBinder extends AbstractBinder {
     @Override
     protected void configure() {
         
-        bind(TransferTransactionEndpointsImpl.class)
-                .to(TransferTransactionEndpoints.class)
-                .in(Singleton.class);
         bind(TransferTransactionServiceImpl.class)
                 .to(TransferTransactionService.class)
                 .in(Singleton.class);;

@@ -25,6 +25,7 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
     protected Application configure() {
         enable(TestProperties.LOG_TRAFFIC);
         enable(TestProperties.DUMP_ENTITY);
+        
         return new JerseyConfig();
     }
     
