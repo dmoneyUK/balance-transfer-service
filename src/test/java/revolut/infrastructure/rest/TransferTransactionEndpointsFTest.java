@@ -25,7 +25,7 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
     }
     
     @Test
-    public void shouldReturn201_whenTransactionIsSuccessful() throws IOException {
+    public void shouldReturn200_whenTransactionIsSuccessful() throws IOException {
     
         final Response response = target(ENDPOINT_URI)
                 .request()
@@ -35,7 +35,7 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
     }
     
     @Test
-    public void shouldReturn404_whenOneAccountNotExist() throws IOException {
+    public void shouldReturn403_whenOneAccountNotExist() throws IOException {
         
         final Response response = target(ENDPOINT_URI)
                 .request()
