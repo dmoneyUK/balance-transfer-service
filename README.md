@@ -31,7 +31,7 @@ mvn clean install
 ```
 Execuatble jar file "target/money-transfer-service-1.0-SNAPSHOT.jar";
 ```bash
-java -jar target/money-transfer-service-1.0-SNAPSHOT.jar
+java -jar target/transfer-service-1.0-SNAPSHOT.jar
 ```
  
  
