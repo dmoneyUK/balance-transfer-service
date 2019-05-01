@@ -74,6 +74,18 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
     }
     
     @Test
+    public void shouldReturn400_whenTransferNegativeAmount() throws IOException {
+        
+        final Response response = target(ENDPOINT_URI)
+                .request()
+                .post(Entity.json(JsonFixtures.read("fixtures/transfer_negative_amount_payload.json")));
+        assertThat(response.getStatus()).isEqualTo(400);
+        
+        assertThat(response.readEntity(String.class)).isEqualTo("Transaction failed and rollback was successful.");
+        
+    }
+    
+    @Test
     public void shouldReturn200ForAll_when100OnePoundTransferRequestsInConcurrent() {
         
         Runnable restFn = () -> {
