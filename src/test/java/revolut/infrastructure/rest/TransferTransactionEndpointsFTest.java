@@ -39,16 +39,6 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
     }
     
     @Test
-    public void shouldReturn400_whenReceivingInvalidRequest() throws IOException {
-        
-        final Response response = target(ENDPOINT_URI)
-                .request()
-                .post(Entity.json(JsonFixtures.read("fixtures/invalid_transfer_payload.json")));
-        assertThat(response.getStatus()).isEqualTo(400);
-        
-    }
-    
-    @Test
     public void shouldReturn403_whenOneAccountNotExist() throws IOException {
         
         final Response response = target(ENDPOINT_URI)
