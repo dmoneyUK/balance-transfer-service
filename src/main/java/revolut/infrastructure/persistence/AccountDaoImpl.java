@@ -2,8 +2,10 @@ package revolut.infrastructure.persistence;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbutils.DbUtils;
+import revolut.domain.exception.AccountNotAvailableException;
 import revolut.domain.exception.InsufficientFundException;
-import revolut.domain.exception.TransationException;
+import revolut.domain.exception.TransactionException;
+import revolut.domain.exception.UnrecoverableException;
 import revolut.domain.model.Account;
 
 import javax.inject.Inject;
@@ -17,9 +19,8 @@ import java.util.Optional;
 @Slf4j
 public class AccountDaoImpl implements AccountDao {
     
-    private final static String SQL_GET_ACC_BY_ID = "SELECT * FROM Account WHERE AccountNumber = ? ";
-    private final static String SQL_LOCK_ACC_BY_ID = "SELECT * FROM Account WHERE AccountNumber = ? FOR UPDATE";
-    private final static String SQL_CREATE_ACC = "INSERT INTO Account (AccountNumber, AccountHolder, Balance) VALUES (?, ?, ?)";
+    private final static String SQL_GET_ACC_BY_ID = "SELECT * from Account WHERE AccountNumber = ? ";
+    private final static String SQL_LOCK_ACC_BY_ID = "SELECT * from Account WHERE AccountNumber = ? FOR UPDATE";
     private final static String SQL_UPDATE_ACC_BALANCE = "UPDATE Account SET Balance = ? WHERE AccountNumber = ? ";
     
     private H2ConnectionsManager connectionManager;
@@ -30,7 +31,7 @@ public class AccountDaoImpl implements AccountDao {
     }
     
     @Override
-    public Account findBy(Integer accountNumber) throws TransationException {
+    public Account findBy(Integer accountNumber) throws TransactionException {
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -53,8 +54,8 @@ public class AccountDaoImpl implements AccountDao {
             }
             return acc;
         } catch (SQLException e) {
-            log.error("Failed to retrieve account with accoutNumber: {}", accountNumber);
-            throw new TransationException("Exception when reading DB", e);
+            log.error("Failed target retrieve account with accoutNumber: {}", accountNumber);
+            throw new TransactionException("Exception when reading DB", e);
         } finally {
             DbUtils.closeQuietly(conn, stmt, rs);
         }
@@ -62,13 +63,14 @@ public class AccountDaoImpl implements AccountDao {
     }
     
     @Override
-    public void transferBalance(Integer fromAccountNumber, Integer toAccountNumber, BigDecimal transferAmount) throws TransationException {
+    public void transferBalance(final Integer sourceAccountNumber, final Integer targetAccountNumber,
+                                final BigDecimal transactionAmount) throws TransactionException {
         Connection conn = null;
         PreparedStatement lockStmt = null;
         PreparedStatement updateStmt = null;
         ResultSet rs = null;
-        Optional<Account> fromAccount = Optional.empty();
-        Optional<Account> toAccount = Optional.empty();
+        Optional<Account> sourceAccountOpt = Optional.empty();
+        Optional<Account> toAccountOpt = Optional.empty();
         
         try {
             conn = connectionManager.getConnection();
@@ -76,48 +78,51 @@ public class AccountDaoImpl implements AccountDao {
             
             // lock the credit and debit account for writing:
             lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
-            lockStmt.setInt(1, fromAccountNumber);
+            lockStmt.setInt(1, sourceAccountNumber);
             rs = lockStmt.executeQuery();
             if (rs.next()) {
-                fromAccount = Optional.ofNullable(Account.builder()
-                                                         .accountNumber(rs.getInt("AccountNumber"))
-                                                         .accountHolder(rs.getString("AccountHolder"))
-                                                         .balance(rs.getBigDecimal("Balance"))
-                                                         .build());
-                log.debug("transferAccountBalance from Account: {}", fromAccount);
+                sourceAccountOpt = Optional.of(Account.builder()
+                                                      .accountNumber(rs.getInt("AccountNumber"))
+                                                      .accountHolder(rs.getString("AccountHolder"))
+                                                      .balance(rs.getBigDecimal("Balance"))
+                                                      .build());
+                log.debug("Found source account: {}", sourceAccountOpt);
+    
             }
-            
+    
             lockStmt = conn.prepareStatement(SQL_LOCK_ACC_BY_ID);
-            lockStmt.setInt(1, toAccountNumber);
+            lockStmt.setInt(1, targetAccountNumber);
             rs = lockStmt.executeQuery();
             if (rs.next()) {
-                toAccount = Optional.ofNullable(Account.builder()
-                                                       .accountNumber(rs.getInt("AccountNumber"))
-                                                       .accountHolder(rs.getString("AccountHolder"))
-                                                       .balance(rs.getBigDecimal("Balance"))
-                                                       .build());
-                log.debug("transferAccountBalance to Account: {}", toAccount);
+                toAccountOpt = Optional.of(Account.builder()
+                                                  .accountNumber(rs.getInt("AccountNumber"))
+                                                  .accountHolder(rs.getString("AccountHolder"))
+                                                  .balance(rs.getBigDecimal("Balance"))
+                                                  .build());
+                log.debug("Found target Account: {}", toAccountOpt);
             }
+    
+            Account sourceAccount = sourceAccountOpt.orElseThrow(
+                    () -> new AccountNotAvailableException("Failed to access to the account: " + sourceAccountNumber));
+            Account targetAccount = toAccountOpt.orElseThrow(
+                    () -> new AccountNotAvailableException("Failed to access to the account: " + targetAccountNumber));
             
-            // check locking status
-            if (!(fromAccount.isPresent() && toAccount.isPresent())) {
-                throw new TransationException("Fail to lock both accounts for write");
-            }
             
             // check enough fund in source account
-            BigDecimal fromAccountbalance = fromAccount.get().getBalance();
-            BigDecimal toAccountbalance = toAccount.get().getBalance();
-            if (fromAccountbalance.compareTo(transferAmount) < 0) {
-                throw new InsufficientFundException("Not enough fund in Account.");
+            BigDecimal sourceAccountBalance = sourceAccount.getBalance();
+            BigDecimal targetAccountBalance = targetAccount.getBalance();
+    
+            if (sourceAccountBalance.compareTo(transactionAmount) < 0) {
+                throw new InsufficientFundException("No sufficient fund in the account: " + sourceAccountNumber);
             }
             
             // proceed with update
             updateStmt = conn.prepareStatement(SQL_UPDATE_ACC_BALANCE);
-            updateStmt.setBigDecimal(1, fromAccountbalance.subtract(transferAmount));
-            updateStmt.setInt(2, fromAccountNumber);
+            updateStmt.setBigDecimal(1, sourceAccountBalance.subtract(transactionAmount));
+            updateStmt.setInt(2, sourceAccountNumber);
             updateStmt.addBatch();
-            updateStmt.setBigDecimal(1, toAccountbalance.add(transferAmount));
-            updateStmt.setInt(2, toAccountNumber);
+            updateStmt.setBigDecimal(1, targetAccountBalance.add(transactionAmount));
+            updateStmt.setInt(2, targetAccountNumber);
             updateStmt.addBatch();
             int[] rowsUpdated = updateStmt.executeBatch();
             log.debug("Number of rows updated for the transfer : " + rowsUpdated[0] + rowsUpdated[1]);
@@ -129,10 +134,10 @@ public class AccountDaoImpl implements AccountDao {
             try {
                 if (conn != null) {
                     conn.rollback();
-                    throw new TransationException("Transaction failed and rollback was successful.");
+                    throw new TransactionException("Transaction failed and rollback was successful.");
                 }
             } catch (SQLException re) {
-                throw new TransationException("Fail to rollback transaction.", re);
+                throw new UnrecoverableException("Transaction failed and could not rollback.", re);
             }
         } finally {
             DbUtils.closeQuietly(conn);

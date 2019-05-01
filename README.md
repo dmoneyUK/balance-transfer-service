@@ -2,45 +2,61 @@
 
 ## Introduciton
 This is a money transfer server application providing the service to sent money from one bank account to another.
-To lanuch a transfer transaction. The service will need the following details of the person or organisation you are paying.
-<ul>From account</ul>
-
-    - Name of the person or business sending money.
-    - Six-digit sort code of the account
-    - Eight-digit account number of the account
-
-<ul>To account</ul>
-
-    - Name of the person or business receiving money
-    - Six-digit sort code of the account
-    - Eight-digit account number of the account
-
-<ul> A reference customerised by the user. </ul>
-<ul> Amount (Currency is hard code to be GBP for now) </ul>
+To launch a transfer transaction, the service will need the following details of the person or organisation you are paying.
+* Source account: Eight-digit account number of the account
+* Target account: Eight-digit account number of the account
+* Amount: decimal scale 2 (assuming Currency code to be GBP for now to avoid exchange logic.)
 
 ## Assumptions and Limitations
-For the time reaason, I made assumptions as below to keep things simple. They ca be improved.
+For the time reason, I made assumptions as below to keep things simple. They could be improved:
 * The service does not do the scheduled transfer. The transaction will happen immediately.
-* The "From" and "To" accounts are both on-us. If transfer to bank accounts not in the system, it will get failure.
+* The "source" and "target" accounts are both on-us. If transfer to bank accounts not in the system, it will get failure.
 (it should invoke other system and is be covered by this implementation.)
-* No many format validations for the request body. Ideally, there should be validations for the length and format of name, reference, sort code, account numbers.
-* No currency is not considered. Assuming currency is GBP.
-* No database is used, all account data are store in a map.
+* No format validations for the request body. Ideally, there should be validations for the length and format of name, account numbers.
+* No currency exchange is not considered. Assuming currency is GBP.
+
+## Demo Tests
+revolut.infrastructure.rest.TransferTransactionEndpointsFTest 
+(Test accounts are loaded when server startup, sql script is in: /src/main/resources/demo.sql)
 
 ## Runtime Environment
 * Java 1.8.0_152
 * Jetty Server 9.4.14.v20181114
+* H2 1.4.197
 
 ## Start Server
-* run the command "mvn clean install" from the project's root folder to build the
- execuatble jar file "target/money-transfer-service-1.0-SNAPSHOT.jar";
-* run the command "java -jar target/money-transfer-service-1.0-SNAPSHOT.jar";
+Run the mvn build command below from the project's root folder to build the
+```bash
+mvn clean install
+```
+Execuatble jar file "target/money-transfer-service-1.0-SNAPSHOT.jar";
+```bash
+java -jar target/money-transfer-service-1.0-SNAPSHOT.jar
+```
+ 
  
 ## API
-<li> url: /revolut/transfer </li>
-<li> method: POST </li>
-<li> body: </li>
+* url: /revolut/transfer
+* method: POST
+* request body:
+```json
+{
+  "source": 11111111,
+  "target": 22222222,
+  "amount": 100
+}
+```
+* Response:
+```
+200: when transfer performed successfully
+403: when transfer failed due to account issue, including account not found, source account has insufficient balance;
+409: when transfer failed and rollback
+500: when unexpected exception happens
+```
 
-
-### Questions:
-* Without spring transactional management
+## Questions:
+* Without spring transactional management? 
+Transactional management should be in the service layer. As spring is not recommended to use and I am not
+familiar with alternatives, just move the responsibility to the dao. Not a good practice and I would not
+use this approach in any production, but manually write transaction framework seems too heavy for this test. 
+Really curious what framework does Revolut use for transaction management.

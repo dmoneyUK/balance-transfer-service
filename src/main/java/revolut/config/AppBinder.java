@@ -2,12 +2,12 @@ package revolut.config;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import revolut.domain.service.TransferTransactionService;
-import revolut.domain.service.TransferTransactionTransactionServiceImpl;
+import revolut.domain.service.TransferTransactionServiceImpl;
 import revolut.infrastructure.persistence.AccountDao;
 import revolut.infrastructure.persistence.AccountDaoImpl;
 import revolut.infrastructure.persistence.H2ConnectionsManager;
-import revolut.infrastructure.rest.MoneyTransferEndpoints;
-import revolut.infrastructure.rest.MoneyTransferEndpointsImpl;
+import revolut.infrastructure.rest.TransferTransactionEndpoints;
+import revolut.infrastructure.rest.TransferTransactionEndpointsImpl;
 
 import javax.inject.Singleton;
 
@@ -16,10 +16,10 @@ public class AppBinder extends AbstractBinder {
     @Override
     protected void configure() {
         
-        bind(MoneyTransferEndpointsImpl.class)
-                .to(MoneyTransferEndpoints.class)
+        bind(TransferTransactionEndpointsImpl.class)
+                .to(TransferTransactionEndpoints.class)
                 .in(Singleton.class);
-        bind(TransferTransactionTransactionServiceImpl.class)
+        bind(TransferTransactionServiceImpl.class)
                 .to(TransferTransactionService.class)
                 .in(Singleton.class);;
         bind(new AccountDaoImpl(getConnectionManager()))

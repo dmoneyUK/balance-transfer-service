@@ -1,12 +1,11 @@
 package revolut.infrastructure.persistence;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.MockitoAnnotations;
+import revolut.domain.exception.AccountNotAvailableException;
 import revolut.domain.exception.InsufficientFundException;
-import revolut.domain.exception.TransationException;
+import revolut.domain.exception.TransactionException;
 import revolut.domain.model.Account;
 
 import java.math.BigDecimal;
@@ -14,7 +13,6 @@ import java.math.BigDecimal;
 import static java.math.BigDecimal.TEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static utils.TestAccount.B;
 
 public class AccountDaoImplITest {
     
@@ -54,7 +52,7 @@ public class AccountDaoImplITest {
         try {
             testObj.transferBalance(ACCOUNT_200_BALANCE, ACCOUNT_MAX_BALANCE, TEN);
             fail("Expected exception was not caught.");
-        }catch (TransationException ex){
+        }catch (TransactionException ex){
             assertThat(ex.getMessage()).isEqualTo("Transaction failed and rollback was successful.");
             
             //verify no change in the accounts
@@ -69,7 +67,7 @@ public class AccountDaoImplITest {
     }
     
     @Test
-    public void shouldInsufficientFundExceptionAndNoChangeInBothAccount_whenTargetAccountOverLimit() {
+    public void shouldThrowInsufficientFundExceptionAndNoChangeInBothAccount_whenTargetAccountOverLimit() {
         try {
             testObj.transferBalance(ACCOUNT_200_BALANCE, ACCOUNT_500_BALANCE, BigDecimal.valueOf(300));
             fail("Expected exception was not caught.");
@@ -81,6 +79,20 @@ public class AccountDaoImplITest {
             Account toAfterTx = testObj.findBy(ACCOUNT_500_BALANCE);
             assertThat(toAfterTx.getBalance()).isEqualTo(FIVE_HUNDREDS);
         }
-     
+    }
+    
+    @Test
+    public void shouldThrowAccountNotAvailableExceptionAndNoChangeInBothAccount_whenFaildToFindAccount() {
+        try {
+            testObj.transferBalance(1234567, ACCOUNT_500_BALANCE, BigDecimal.valueOf(300));
+            fail("Expected exception was not caught.");
+        } catch (AccountNotAvailableException ex) {
+    
+            Account fromAfterTx = testObj.findBy(ACCOUNT_200_BALANCE);
+            assertThat(fromAfterTx.getBalance()).isEqualTo(TWO_HUNDREDS);
+    
+            Account toAfterTx = testObj.findBy(ACCOUNT_500_BALANCE);
+            assertThat(toAfterTx.getBalance()).isEqualTo(FIVE_HUNDREDS);
+        }
     }
 }

@@ -1,14 +1,15 @@
 package revolut.domain.dto;
 
-public enum TransactionResult {
-    
-    SUCCESS(""),
-    UNSUPPORTED("Unsupported Function"),
-    DEFAULT_FAILURE("Server error");
-    
-    private String errorMessage;
-    
-    TransactionResult(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TransactionResult {
+    private TransactionResultType resultType;
+    private String reason;
 }
