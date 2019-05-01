@@ -10,7 +10,11 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransferTransactionEndpointsFTest extends JerseyTest {
@@ -68,6 +72,30 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
         assertThat(response.readEntity(String.class)).isEqualTo("Transaction failed and rollback was successful.");
         
     }
+    
+    @Test
+    public void shouldReturn200ForAll_when100OnePoundTransferRequestsInConcurrent() {
+        
+        Runnable restFn = () -> {
+            
+            try {
+                Response response = target(ENDPOINT_URI)
+                        .request()
+                        .post(Entity.json(JsonFixtures.read("fixtures/successful_transfer_one_pound_payload.json")));
+                assertThat(response.getStatus()).isEqualTo(200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+        
+        List<CompletableFuture> futures = IntStream.range(0, 100)
+                                                   .mapToObj((i) -> CompletableFuture.runAsync(restFn))
+                                                   .collect(toList());
+        
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+        
+    }
+    
     
 }
 

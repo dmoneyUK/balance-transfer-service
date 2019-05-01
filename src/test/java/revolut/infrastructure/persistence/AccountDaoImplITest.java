@@ -8,9 +8,15 @@ import revolut.domain.exception.InsufficientFundException;
 import revolut.domain.exception.TransactionException;
 import revolut.domain.model.Account;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 
+import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -94,5 +100,26 @@ public class AccountDaoImplITest {
             Account toAfterTx = testObj.findBy(ACCOUNT_500_BALANCE);
             assertThat(toAfterTx.getBalance()).isEqualTo(FIVE_HUNDREDS);
         }
+    }
+    
+    @Test
+    public void shouldUpdateBothAccountsWith100_when100OnePoundTransfer() throws IOException {
+        
+            Runnable restFn = () -> {
+            testObj.transferBalance(ACCOUNT_200_BALANCE, ACCOUNT_500_BALANCE, ONE);
+        };
+        
+        List<CompletableFuture> futures = IntStream.range(0, 100)
+                                                   .mapToObj((i) -> CompletableFuture.runAsync(restFn))
+                                                   .collect(toList());
+        
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+    
+        Account fromAfterTx = testObj.findBy(ACCOUNT_200_BALANCE);
+        Account toAfterTx = testObj.findBy(ACCOUNT_500_BALANCE);
+    
+        assertThat(fromAfterTx.getBalance()).isEqualTo(TWO_HUNDREDS.subtract(BigDecimal.valueOf(100)));
+        assertThat(toAfterTx.getBalance()).isEqualTo(FIVE_HUNDREDS.add(BigDecimal.valueOf(100)));
+        
     }
 }
