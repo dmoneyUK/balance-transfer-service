@@ -18,11 +18,11 @@ public class TransferTransactionRequest {
     
     @Min(10000000)
     @Max(99999999)
-    private Integer source;
+    private int source;
     
     @Min(10000000)
     @Max(99999999)
-    private Integer target;
+    private int target;
     
     @DecimalMin(value = "0.00")
     private BigDecimal amount;

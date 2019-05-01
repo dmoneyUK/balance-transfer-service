@@ -25,7 +25,6 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
     protected Application configure() {
         enable(TestProperties.LOG_TRAFFIC);
         enable(TestProperties.DUMP_ENTITY);
-        
         return new JerseyConfig();
     }
     
@@ -37,6 +36,16 @@ public class TransferTransactionEndpointsFTest extends JerseyTest {
                 .post(Entity.json(JsonFixtures.read("fixtures/successful_transfer_payload.json")));
         assertThat(response.getStatus()).isEqualTo(200);
     
+    }
+    
+    @Test
+    public void shouldReturn400_whenReceivingInvalidRequest() throws IOException {
+        
+        final Response response = target(ENDPOINT_URI)
+                .request()
+                .post(Entity.json(JsonFixtures.read("fixtures/invalid_transfer_payload.json")));
+        assertThat(response.getStatus()).isEqualTo(400);
+        
     }
     
     @Test
