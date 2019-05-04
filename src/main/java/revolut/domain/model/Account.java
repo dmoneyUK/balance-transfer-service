@@ -1,23 +1,23 @@
 package revolut.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
-@Getter
-@EqualsAndHashCode
-@ToString
-@Builder
-@AllArgsConstructor
+@Data
+@Entity
 public class Account {
     
-    private final Integer accountNumber;
-    private final String accountHolder;
-    private final BigDecimal balance;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private Integer accountNumber;
+    
+    private String accountHolder;
+    private BigDecimal balance;
+
 }

@@ -16,7 +16,7 @@ For the time reason, I made assumptions as below to keep things simple. They cou
 * No currency exchange is not considered. Assuming currency is GBP.
 
 ## Demo Tests
-revolut.infrastructure.rest.TransferTransactionEndpointsFTest 
+revolut.infrastructure.rest.TransactionEndpointsFTest 
 (Test accounts are loaded when server startup, sql script is in: /src/main/resources/demo.sql)
 
 ## Runtime Environment

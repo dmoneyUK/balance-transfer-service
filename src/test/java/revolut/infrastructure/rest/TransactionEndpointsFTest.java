@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TransferTransactionEndpointsFTest extends JerseyTest {
+public class TransactionEndpointsFTest extends JerseyTest {
     
     private static final String ENDPOINT_URI = "transactions/transfer";
     

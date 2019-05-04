@@ -5,10 +5,12 @@ import revolut.domain.dto.TransactionResult;
 import revolut.domain.exception.AccountNotAvailableException;
 import revolut.domain.exception.InsufficientFundException;
 import revolut.domain.exception.TransactionException;
+import revolut.infrastructure.framework.TransactionWrapper;
 import revolut.infrastructure.persistence.AccountDao;
 import revolut.infrastructure.rest.entity.TransferTransactionRequest;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 
 import static revolut.domain.dto.TransactionResultType.ACCOUNT_ERROR;
 import static revolut.domain.dto.TransactionResultType.BUSINESS_ERROR;
@@ -37,7 +39,8 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         log.info("Processing transfer transaction: {}", transferRequest);
         TransactionResult result = TransactionResult.builder().resultType(SUCCESS).build();
         try {
-            accountDao.transferBalance(transferRequest.getSource(), transferRequest.getTarget(), transferRequest.getAmount());
+            accountDao.updateBalance(transferRequest.getSource(), BigDecimal.ZERO.subtract(transferRequest.getAmount()));
+            accountDao.updateBalance(transferRequest.getTarget(), transferRequest.getAmount());
         } catch (InsufficientFundException | AccountNotAvailableException ae) {
             result = TransactionResult.builder().resultType(ACCOUNT_ERROR).reason(ae.getMessage()).build();
         } catch (TransactionException te) {

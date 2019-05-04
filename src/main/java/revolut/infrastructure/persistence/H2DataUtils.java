@@ -11,34 +11,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Slf4j
-public class H2ConnectionsManager {
+public class H2DataUtils {
     
-    private static H2ConnectionsManager instance;
-    
-    private H2ConnectionsManager() {
+    public static void populateTestData() {
         DbUtils.loadDriver("org.h2.Driver");
-    }
-    
-    public static H2ConnectionsManager getInstance() {
-        if (instance == null) {
-            synchronized (H2ConnectionsManager.class) {
-                if (instance == null) {
-                    instance = new H2ConnectionsManager();
-                }
-            }
-        }
-        return instance;
-    }
-    
-    public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:h2:mem:revolut;DB_CLOSE_DELAY=-1", "sa", "sa");
-    }
-    
-    public void populateTestData() {
         log.info("Populating Test User Table and data ..... ");
         Connection conn = null;
         try {
-            conn = getConnection();
+            conn = DriverManager.getConnection("jdbc:h2:mem:revolut;DB_CLOSE_DELAY=-1", "sa", "sa");
             RunScript.execute(conn, new FileReader("src/main/resources/demo.sql"));
         } catch (SQLException e) {
             log.error("populateTestData(): Error populating user data: ", e);

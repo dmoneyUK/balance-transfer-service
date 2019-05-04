@@ -7,6 +7,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import revolut.config.JerseyConfig;
+import revolut.infrastructure.persistence.H2DataUtils;
 
 //@Slf4j
 public class Application {
@@ -21,6 +22,7 @@ public class Application {
         Server jettyServer = new Server(8080);
         ServletContextHandler context = new ServletContextHandler(jettyServer, "/");
         context.addServlet(jerseyServlet, "/*");
+        H2DataUtils.populateTestData();
         
         try {
             jettyServer.start();

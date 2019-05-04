@@ -8,5 +8,7 @@ import java.math.BigDecimal;
 public interface AccountDao {
     Account findBy(Integer AccountNumber) throws TransactionException;
     
-    void transferBalance(Integer sourceAccountNumber, Integer targetAccountNumber, BigDecimal transactionAmount) throws TransactionException;;
+    int updateBalance(Integer accountNumber, BigDecimal update);
+    
+    //void transferBalance(Integer sourceAccountNumber, Integer targetAccountNumber, BigDecimal transactionAmount) throws TransactionException;;
 }
